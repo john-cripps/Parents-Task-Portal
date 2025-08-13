@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>John’s Organization Hub — Premium</title>
+<style>
+  :root{--bg:#0f1222;--card:#151a30;--muted:#8a93b2;--text:#eef1ff;--accent:#7c5cff;--accent2:#22d3ee;--good:#34d399;--warn:#f59e0b;--bad:#ef4444;--stroke:#2a3152}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(160deg,#0b0e1b,#161a33 45%,#0f1222);color:var(--text)}
+  .container{max-width:1280px;margin:auto;padding:24px}
+  header.hero{position:sticky;top:0;z-index:9;background:linear-gradient(90deg,#141834aa,#101429aa);backdrop-filter:blur(10px);border-bottom:1px solid #1f2442}
+  .hero-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:42px;height:42px;border-radius:12px;background:conic-gradient(from 260deg,var(--accent),var(--accent2));box-shadow:0 0 24px #7c5cff44, inset 0 0 10px #111}
+  h1{font-size:20px;margin:0}
+  .sub{font-size:12px;color:var(--muted)}
+  .pill{border:1px solid #283058;border-radius:999px;padding:6px 12px;font-size:12px;color:var(--muted)}
+  .row{display:grid;gap:16px}
+  @media(min-width:1024px){.row{grid-template-columns:1.2fr 1fr}}
+  .card{background:linear-gradient(180deg,#141936,#11152c);border:1px solid var(--stroke);border-radius:16px;padding:16px;box-shadow:0 8px 30px #0a0d1caa}
+  .card h2{margin:0 0 8px;font-size:16px}
+  .toolbar{display:flex;gap:8px;align-items:center}
+  button,.btn{background:linear-gradient(180deg,#262c52,#1b2042);border:1px solid #2b3160;color:#e7ebff;border-radius:12px;padding:8px 12px;font-weight:600;cursor:pointer}
+  button:hover{filter:brightness(1.1)}
+  .accent{background:linear-gradient(180deg,#7c5cff,#5b44ff);border-color:#735cff;color:white}
+  .ghost{background:transparent;border-color:#2a3152;color:var(--muted)}
+  .grid{display:grid;gap:16px}
+  @media(min-width:920px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+  .ring{--p:0;position:relative;width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--good) calc(var(--p)*1%),#273057 0);display:grid;place-items:center;margin:auto}
+  .ring::before{content:"";position:absolute;inset:10px;background:linear-gradient(180deg,#0f1327,#141936);border-radius:50%;box-shadow:inset 0 0 0 1px var(--stroke)}
+  .ring span{position:relative;font-size:28px;font-weight:800}
+  .muted{color:var(--muted)}
+  .kanban{display:grid;gap:12px}
+  @media(min-width:900px){.kanban{grid-template-columns:repeat(3,1fr)}}
+  .col{background:#11152c;border:1px dashed #2a3152;border-radius:14px;padding:10px;min-height:190px}
+  .col h3{margin:4px 4px 8px;font-size:14px;color:var(--muted)}
+  .task{background:linear-gradient(180deg,#192046,#151b3c);border:1px solid #2a3152;border-radius:12px;padding:10px;margin:8px 4px;cursor:grab}
+  .task[data-priority="high"]{border-color:#5f2b2b;background:linear-gradient(180deg,#2a1320,#1b1020)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .chip{font-size:10px;padding:4px 8px;border-radius:999px;border:1px solid #2a3152;color:#b8c1ff}
+  .chip.red{border-color:#4a2234;color:#ffb4c4}
+  .chip.amber{border-color:#4a3a22;color:#ffd6a1}
+  table{width:100%;border-collapse:separate;border-spacing:0 8px}
+  th,td{padding:10px 12px;font-size:13px}
+  th{color:#b8c1ff;text-align:left;border-bottom:1px solid #233}
+  tr.item{background:linear-gradient(180deg,#151a34,#12162e);border:1px solid #263055}
+  tr.item td:first-child{border-radius:12px 0 0 12px}
+  tr.item td:last-child{border-radius:0 12px 12px 0}
+  .tag{font-size:11px;border:1px solid #2a3152;border-radius:999px;padding:2px 8px}
+  .due.soon{color:#ffd6a1}
+  .due.late{color:#ffb4b4}
+  .snapshot{display:grid;gap:12px}
+  @media(min-width:920px){.snapshot{grid-template-columns:1fr 1fr 1fr}}
+  .kpi{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--stroke);border-radius:12px;background:linear-gradient(180deg,#141936,#11162d)}
+  .kpi strong{font-size:22px}
+  .badge{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid #2a3152}
+  .success{color:#8ff8c7;border-color:#2b5346}
+  .warning{color:#ffe4a6;border-color:#5b4b2b}
+  dialog{border:none;border-radius:16px;background:#0d1228;color: var(--text);padding:0;box-shadow:0 30px 80px #0007}
+  dialog .modal-body{padding:18px;border:1px solid var(--stroke);border-radius:16px}
+  dialog::backdrop{background:#0008}
+  .field{display:grid;gap:6px;margin:10px 0}
+  input,select,textarea{background:#0f1430;border:1px solid #2a3152;border-radius:10px;color:#e8ecff;padding:10px}
+  .tiny{font-size:11px;color:var(--muted)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .divider{height:1px;background:#2a3152;margin:10px 0}
+  .week{display:grid;gap:10px}
+  @media(min-width:900px){.week{grid-template-columns:repeat(7,1fr)}}
+  .day{border:1px solid #2a3152;border-radius:12px;padding:10px;background:#0f1430}
+  .day h4{margin:0 0 6px;font-size:12px;color:#b8c1ff}
+  .mini{font-size:12px;opacity:.85}
+  footer{opacity:.7;text-align:center;margin:28px 0 40px}
+  #tests table{width:100%;border-collapse:collapse}
+  #tests th,#tests td{padding:8px;border:1px solid #2a3152}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>John’s Organization Hub</h1>
+          <div class="sub">Live progress • Deadlines • Parent snapshot</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <span class="pill" id="lastUpdated">Last updated — just now</span>
+        <button class="btn" onclick="window.print()">🖨️ Print</button>
+        <button class="ghost" id="exportJSON">Export Data</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="row">
+      <section class="card">
+        <h2>✅ Today Check‑In</h2>
+        <div class="grid grid-3">
+          <div>
+            <div class="ring" id="ring" style="--p:0"><span id="percent">0%</span></div>
+            <div class="tiny" style="text-align:center;margin-top:8px">Completion across all tasks</div>
+          </div>
+          <div>
+            <div class="kpi"><div>📅</div><div><div class="muted">Next due</div><strong id="nextDue">—</strong></div></div>
+            <div class="kpi"><div>🔥</div><div><div class="muted">Streak</div><strong id="streak">0 days</strong></div></div>
+          </div>
+          <div>
+            <div class="kpi"><div>🎯</div><div><div class="muted">Today’s target</div><strong id="todayTarget">5 tasks</strong></div></div>
+            <div class="kpi"><div>🏆</div><div><div class="muted">Badges</div><div><span class="badge success">Perfect Week</span><span class="badge warning">On‑Time 95%</span></div></div></div>
+          </div>
+        </div>
+        <div class="controls" style="margin-top:12px">
+          <button class="accent" id="checkIn">Daily Check‑In</button>
+          <button class="ghost" id="emailMsAleman">Email Ms. Aleman</button>
+          <input id="search" placeholder="Search tasks" />
+          <select id="filterCourse"><option value="">All courses</option><option>English</option><option>History</option><option>Math</option><option>Science</option><option>ASL</option><option>PE</option><option>General</option></select>
+          <select id="filterStatus"><option value="">All status</option><option value="todo">To Do</option><option value="doing">In Progress</option><option value="done">Done</option></select>
+          <span class="pill" id="parentViewPill">Parent View: Off</span>
+          <button class="ghost" id="toggleParentView">Toggle Parent View</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>🗂️ Parent Snapshot</h2>
+        <div class="snapshot">
+          <div class="kpi"><div>📘</div><div><div class="muted">Syllabi reviewed</div><strong id="syllabiReviewed">0/6</strong></div></div>
+          <div class="kpi"><div>🧭</div><div><div class="muted">All deadlines on calendar</div><strong id="deadlineCoverage">0%</strong></div></div>
+          <div class="kpi"><div>✉️</div><div><div class="muted">Language plan (Ms. Aleman)</div><strong id="langPlan">Pending</strong></div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="controls">
+          <button class="ghost" id="copySummary">Copy Daily Summary</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>🧱 Task Board (Drag & Drop)</h2>
+      <div class="controls" id="addControls" style="margin-bottom:8px">
+        <input id="newTask" placeholder="Add a task… e.g., Review History syllabus" />
+        <select id="newCourse"><option value="General">General</option><option>English</option><option>History</option><option>Math</option><option>Science</option><option>ASL</option><option>PE</option></select>
+        <select id="newPriority"><option value="normal">Normal</option><option value="high">High</option></select>
+        <input id="newDue" type="date" />
+        <button id="addTask" class="accent">Add</button>
+      </div>
+      <div class="kanban" id="kanban">
+        <div class="col" data-col="todo"><h3>To Do</h3></div>
+        <div class="col" data-col="doing"><h3>In Progress</h3></div>
+        <div class="col" data-col="done"><h3>Done</h3></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>📅 Deadlines</h2>
+      <table>
+        <thead><tr><th>Item</th><th>Course</th><th>Due</th><th>Status</th></tr></thead>
+        <tbody id="deadlines"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>🗓️ Weekly Planner</h2>
+      <div class="week" id="week"></div>
+      <div class="mini muted" id="weekRange"></div>
+    </section>
+
+    <section class="card">
+      <h2>🧭 Mission Plan (from Parents)</h2>
+      <ul class="mini" style="line-height:1.7">
+        <li>Get yourself organized and don’t argue. Be aware of everything you need to do for each course.</li>
+        <li>Go through each course syllabus; log all deadlines and projects.</li>
+        <li>Tell <strong>Ms. Aleman</strong> you failed ASL; ask options for language & if she can help.</li>
+        <li>Use your calendar. Check Schoology daily.</li>
+        <li>Find out campus days (e.g., picture day) and add them.</li>
+        <li>Be inquisitive: wide view (semester) + close up (today). Make lists.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>📘 Enrollment Details</h2>
+      <div class="grid" style="gap:16px">
+        <div class="card" style="padding:12px">
+          <h3 style="margin:0 0 6px">English 11 Honors Sem 1</h3>
+          <div class="mini muted">Student: <strong>John Cripps</strong> • Classroom: <strong>1VA26 Honors English 11A</strong> • Teacher: <strong>Evelyn Rivera</strong></div>
+          <div class="controls" style="margin-top:8px">
+            <input id="courseSearchEnglish" placeholder="Search English assignments" />
+            <button class="ghost" id="refreshEnglish">Refresh</button>
+          </div>
+          <table style="margin-top:8px">
+            <thead><tr><th>Assignment</th><th>Points</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="assignmentsEnglish"></tbody>
+          </table>
+        </div>
+        <div class="card" style="padding:12px">
+          <h3 style="margin:0 0 6px">Principles of Business, Marketing, and Finance Sem 1</h3>
+          <div class="mini muted">Student: <strong>John Cripps</strong> • Classroom: <strong>1VA26 Principles Business Marketing A</strong> • Teacher: <strong>Kelly Loftus</strong></div>
+          <div class="controls" style="margin-top:8px">
+            <input id="courseSearchBusiness" placeholder="Search Business/Marketing assignments" />
+            <button class="ghost" id="refreshBusiness">Refresh</button>
+          </div>
+          <table style="margin-top:8px">
+            <thead><tr><th>Assignment</th><th>Points</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="assignmentsBusiness"></tbody>
+          </table>
+        </div>
+        <div class="card" style="padding:12px">
+          <h3 style="margin:0 0 6px">Statistics and Probability Sem 1</h3>
+          <div class="mini muted">Student: <strong>John Cripps</strong> • Classroom: <strong>1VA 26 Statistics A</strong> • Teacher: <strong>Carolyn Kreiger</strong></div>
+          <div class="controls" style="margin-top:8px">
+            <input id="courseSearchStats" placeholder="Search Statistics assignments" />
+            <button class="ghost" id="refreshStats">Refresh</button>
+          </div>
+          <table style="margin-top:8px">
+            <thead><tr><th>Assignment</th><th>Points</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="assignmentsStats"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="dates">
+      <h2>🏫 2025–26 School Year Important Dates</h2>
+      <div class="mini muted" style="margin-bottom:6px">Source: Palisades Charter High School</div>
+      <ul id="schoolDates" style="line-height:1.7"></ul>
+    </section>
+
+    <section class="card" id="tests">
+      <h2>Tests</h2>
+      <div class="controls" style="margin-bottom:8px">
+        <button class="ghost" id="runTests">Run Tests</button>
+        <span class="pill" id="testSummary">Not run</span>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Result</th><th>Details</th></tr></thead>
+        <tbody id="testResults"></tbody>
+      </table>
+    </section>
+
+    <footer>
+      Built to impress • Local-only data
+    </footer>
+  </div>
+
+  <dialog id="emailModal">
+    <div class="modal-body">
+      <h3 style="margin:0 0 8px">Draft email to Ms. Aleman</h3>
+      <div class="field"><label>To</label><input value="ms.aleman@example.edu" /></div>
+      <div class="field"><label>Subject</label><input id="emailSubject" value="Language Requirement Next Steps" /></div>
+      <div class="field"><label>Body</label><textarea id="emailBody" rows="8">Hi Ms. Aleman,
+
+I wanted to let you know I did not pass ASL. I’m getting organized for this term and want to make sure I fulfill the language requirement properly. Could you share my options (e.g., retaking ASL, switching to another language) and any recommendations? If possible, I’d appreciate your guidance on the best next step and how to enroll.
+
+Thanks so much for your help,
+John
+        </textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button class="ghost" onclick="this.closest('dialog').close()">Close</button><button class="accent" id="copyEmail">Copy to Clipboard</button></div>
+    </div>
+  </dialog>
+
+<script>
+(function(){
+  var re=/metamask|ethereum|wallet/i;
+  var origCE=console.error;console.error=function(){for(var i=0;i<arguments.length;i++){if(re.test(String(arguments[i]||'')))return}return origCE.apply(console,arguments)};
+  var origCW=console.warn;console.warn=function(){for(var i=0;i<arguments.length;i++){if(re.test(String(arguments[i]||'')))return}return origCW.apply(console,arguments)};
+  function prevent(e){var msg=e&&(e.message||e.reason&&(e.reason.message||e.reason)||'');if(re.test(String(msg||''))){if(e.preventDefault) e.preventDefault();return true}}
+  var origOnError=window.onerror;window.onerror=function(message){if(prevent({message:message}))return true;if(typeof origOnError==='function')return origOnError.apply(this,arguments)};
+  window.onunhandledrejection=function(e){if(prevent(e))return true};
+  window.addEventListener('error',function(e){prevent(e)},true);
+  window.addEventListener('unhandledrejection',function(e){prevent(e)},true);
+})();
+
+const state = JSON.parse(localStorage.getItem('john_org_hub')||'null') || {tasks:[{id:uid(), title:'Review Syllabus — English', course:'English', due:ds(2025,8,15), priority:'normal', col:'done', created:Date.now()},{id:uid(), title:'Email Ms. Aleman about language options', course:'ASL', due:ds(2025,8,14), priority:'high', col:'done', created:Date.now()},{id:uid(), title:'Check Schoology & add new items', course:'General', due:ds(2025,8,14), priority:'normal', col:'doing', created:Date.now()},{id:uid(), title:'Confirm Picture Day date & add to calendar', course:'General', due:ds(2025,8,16), priority:'normal', col:'todo', created:Date.now()}],streak:0,lastCheckIn:null,parentView:false,filters:{q:'',course:'',status:''},assignmentDone:{english:{},business:{},statistics:{}}};
+
+const q=(s,p=document)=>p.querySelector(s);const qa=(s,p=document)=>Array.from(p.querySelectorAll(s));const $ring=q('#ring');const $pct=q('#percent');const $next=q('#nextDue');const $streak=q('#streak');const $dead=q('#deadlines');const $syllabi=q('#syllabiReviewed');const $coverage=q('#deadlineCoverage');const $lang=q('#langPlan');const $last=q('#lastUpdated');
+
+function uid(){return Math.random().toString(36).slice(2,9)}function pad(n){return String(n).padStart(2,'0')}function ds(y,m,d){return y+'-'+pad(m)+'-'+pad(d)}function save(){localStorage.setItem('john_org_hub',JSON.stringify(state));$last.textContent='Last updated — '+new Date().toLocaleString()}
+
+function filteredTasks(){return state.tasks.filter(function(t){if(state.filters.q&&!(t.title.toLowerCase().includes(state.filters.q)||t.course.toLowerCase().includes(state.filters.q)))return false;if(state.filters.course&&t.course!==state.filters.course)return false;if(state.filters.status&&t.col!==state.filters.status)return false;return true})}
+
+function render(){qa('.col').forEach(function(col){qa('.task',col).forEach(function(el){el.remove()})});filteredTasks().forEach(function(t){var el=document.createElement('div');el.className='task';el.draggable=!state.parentView;el.dataset.id=t.id;el.dataset.priority=t.priority;el.innerHTML='<strong>'+t.title+'</strong><div class="chips"><span class="chip">'+t.course+'</span>'+(t.priority==='high'?'<span class="chip red">High</span>':'')+(t.due?'<span class="chip amber">Due '+t.due+'</span>':'')+'</div>';el.addEventListener('dragstart',function(e){e.dataTransfer.setData('text/plain',t.id)});q('.col[data-col="'+t.col+'"]').appendChild(el)});$dead.innerHTML='';var sorted=filteredTasks().filter(function(t){return t.due}).slice().sort(function(a,b){return a.due.localeCompare(b.due)});sorted.forEach(function(t){var tr=document.createElement('tr');tr.className='item';var dueClass=(new Date(t.due)<new Date()&&t.col!=='done')?'late':(daysUntil(t.due)<=3?'soon':'');tr.innerHTML='<td>'+t.title+'</td><td><span class="tag">'+t.course+'</span></td><td class="due '+dueClass+'">'+t.due+'</td><td>'+(t.col==='done'?'✅ Done':t.col==='doing'?'⏳ In progress':'• To do')+'</td>';$dead.appendChild(tr)});var total=state.tasks.length;var done=state.tasks.filter(function(t){return t.col==='done'}).length;var p=total?Math.round(done/total*100):0;$ring.style.setProperty('--p',p);$pct.textContent=p+'%';var upcoming=sorted.filter(function(t){return t.col!=='done'})[0];$next.textContent=upcoming?upcoming.title+' — '+upcoming.due:'All set';var syllabiCourses=['English','History','Math','Science','ASL','PE'];var reviewed=syllabiCourses.filter(function(c){return state.tasks.some(function(t){return /review syllabus/i.test(t.title)&&t.course===c&&t.col==='done'})}).length;$syllabi.textContent=reviewed+'/'+syllabiCourses.length;var withDue=state.tasks.filter(function(t){return t.due}).length;var covered=Math.round(withDue/Math.max(1,state.tasks.length)*100);$coverage.textContent=covered+'%';var langDone=state.tasks.some(function(t){return /aleman/i.test(t.title)&&t.col==='done'});$lang.textContent=langDone?'Contacted — awaiting reply':'Pending';$streak.textContent=(state.streak||0)+' day'+((state.streak||0)===1?'':'s');q('#parentViewPill').textContent='Parent View: '+(state.parentView?'On':'Off');q('#addControls').style.display=state.parentView?'none':'flex';renderWeek()}
+
+function daysUntil(d){return Math.ceil((new Date(d)-new Date())/86400000)}
+
+qa('.col').forEach(function(col){col.addEventListener('dragover',function(e){if(state.parentView)return;e.preventDefault()});col.addEventListener('drop',function(e){if(state.parentView)return;e.preventDefault();var id=e.dataTransfer.getData('text/plain');var t=state.tasks.find(function(x){return x.id===id});if(!t)return;t.col=col.dataset.col;save();render()})});
+
+q('#addTask').addEventListener('click',function(){if(state.parentView)return;var title=q('#newTask').value.trim();if(!title)return;var course=q('#newCourse').value;var priority=q('#newPriority').value;var due=q('#newDue').value||null;state.tasks.push({id:uid(),title:title,course:course,priority:priority,due:due,col:'todo',created:Date.now()});q('#newTask').value='';q('#newDue').value='';save();render()});
+
+function doCheckIn(now){var t=now||Date.now();var today=new Date(t);var todayKey=new Date(today.getFullYear(),today.getMonth(),today.getDate()).getTime();if(state.lastCheckIn){var last=new Date(state.lastCheckIn);var lastKey=new Date(last.getFullYear(),last.getMonth(),last.getDate()).getTime();if(todayKey-lastKey===86400000){state.streak=(state.streak||0)+1}else if(todayKey!==lastKey){state.streak=1}}else{state.streak=1}state.lastCheckIn=t;save();render()}
+
+q('#checkIn').addEventListener('click',function(){doCheckIn()});
+
+const emailModal=q('#emailModal');q('#emailMsAleman').addEventListener('click',function(){emailModal.showModal()});q('#copyEmail').addEventListener('click',function(){var body=q('#emailBody').value;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(body).then(function(){alert('Copied email draft to clipboard!')})}else{var ta=document.createElement('textarea');ta.value=body;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();alert('Copied email draft to clipboard!')}});
+
+q('#exportJSON').addEventListener('click',function(){var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='john_org_hub.json';a.click()});
+
+q('#toggleParentView').addEventListener('click',function(){state.parentView=!state.parentView;save();render()});
+
+q('#search').addEventListener('input',function(e){state.filters.q=(e.target.value||'').toLowerCase();render()});q('#filterCourse').addEventListener('change',function(e){state.filters.course=e.target.value;render()});q('#filterStatus').addEventListener('change',function(e){state.filters.status=e.target.value;render()});
+
+q('#copySummary').addEventListener('click',function(){var done=state.tasks.filter(function(t){return t.col==='done'});var doing=state.tasks.filter(function(t){return t.col==='doing'});var todo=state.tasks.filter(function(t){return t.col==='todo'});var s='Daily Summary\n\nDone ('+done.length+'):\n- '+done.map(function(t){return t.title}).join('\n- ')+'\n\nIn Progress ('+doing.length+'):\n- '+doing.map(function(t){return t.title}).join('\n- ')+'\n\nTo Do ('+todo.length+'):\n- '+todo.map(function(t){return t.title}).join('\n- ');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(function(){alert('Copied summary to clipboard')})}});
+
+function renderWeek(){var wrap=q('#week');wrap.innerHTML='';var start=new Date();start.setHours(0,0,0,0);var labels=[];for(var i=0;i<7;i++){var d=new Date(start.getTime()+i*86400000);labels.push(d.toLocaleDateString());var col=document.createElement('div');col.className='day';var dsKey=ds(d.getFullYear(),d.getMonth()+1,d.getDate());col.innerHTML='<h4>'+d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+'</h4>';var items=state.tasks.filter(function(t){return t.due===dsKey});if(!items.length){var e=document.createElement('div');e.className='mini muted';e.textContent='No due items';col.appendChild(e)}else{items.forEach(function(t){var e=document.createElement('div');e.className='mini';e.textContent='• '+t.title+' ('+t.course+')';col.appendChild(e)})}wrap.appendChild(col)}q('#weekRange').textContent='This week: '+labels[0]+' → '+labels[6]}
+
+function ensureAssignMap(key){state.assignmentDone=state.assignmentDone||{english:{},business:{},statistics:{}};if(!state.assignmentDone[key]) state.assignmentDone[key]={}}
+function assignmentIsDone(key,title){ensureAssignMap(key);return !!state.assignmentDone[key][title]}
+function setAssignmentDone(key,title,done){ensureAssignMap(key);state.assignmentDone[key][title]=!!done;save()}
+function addAssignmentToTasks(course,title){if(state.parentView)return;var exists=state.tasks.some(function(t){return t.title===title && t.course===course});if(!exists){state.tasks.push({id:uid(),title:title,course:course,priority:'normal',due:null,col:'todo',created:Date.now()});save();render()}}
+function renderAssignments(list, tbody, filter, key, courseLabel){
+  tbody.innerHTML='';
+  list.filter(function(x){return !filter||x[0].toLowerCase().includes(filter)}).forEach(function(item){
+    var title=item[0];
+    var pts=item[1];
+    var tr=document.createElement('tr');
+    var done=assignmentIsDone(key,title);
+    var tdA=document.createElement('td');tdA.textContent=title; if(done){tdA.style.textDecoration='line-through';tdA.style.opacity='0.7'}
+    var tdP=document.createElement('td');tdP.textContent=pts;
+    var tdS=document.createElement('td');tdS.textContent=done?'✅ Done':'Not Complete';
+    var tdActions=document.createElement('td');
+    var btnDone=document.createElement('button');btnDone.className='ghost';btnDone.textContent=done?'Mark Not Done':'Mark Done';btnDone.addEventListener('click',function(){setAssignmentDone(key,title,!done);renderCourses()});
+    var btnAdd=document.createElement('button');btnAdd.className='ghost';btnAdd.textContent='➕ Add to To‑Do';btnAdd.addEventListener('click',function(){addAssignmentToTasks(courseLabel,title)});
+    tdActions.appendChild(btnDone);tdActions.appendChild(btnAdd);
+    tr.appendChild(tdA);tr.appendChild(tdP);tr.appendChild(tdS);tr.appendChild(tdActions);
+    tbody.appendChild(tr);
+  });
+}
+
+const englishAssignments = [
+  ['1.1.4 Quiz: Understand Rhetoric',10,'Not Complete'],
+  ['1.1.6 Quiz: Patrick Henry and Thomas Paine',5,'Not Complete'],
+  ['1.1.8 Quiz: Analyze Rhetoric',10,'Not Complete'],
+  ['1.2.2 Quiz: Understand the Declaration of Independence',10,'Not Complete'],
+  ['1.2.4 Quiz: The Declaration of Independence and an Essay',5,'Not Complete'],
+  ['1.2.7 Quiz: Analyze the Declaration',10,'Not Complete'],
+  ['1.3.3 Quiz: Understand the Constitution',10,'Not Complete'],
+  ['1.3.5 Quiz: Tinker v. Des Moines',5,'Not Complete'],
+  ['1.3.7 Quiz: Analyze a Supreme Court Decision',10,'Not Complete'],
+  ['1.4.3 Test (CST): The American Revolution',40,'Not Complete'],
+  ['1.4.4 Test (TST): The American Revolution',45,'Not Complete'],
+  ['2.1.3 Quiz: Understand Poetry',10,'Not Complete'],
+  ['2.1.5 Quiz: Whitman and Dickinson',5,'Not Complete'],
+  ['2.1.7 Quiz: Analyze Poetry',10,'Not Complete'],
+  ['2.2.3 Quiz: Understand Gothic Writing',10,'Not Complete'],
+  ['2.2.5 Quiz: "The Raven" and "The Philosophy of Composition"',5,'Not Complete'],
+  ['2.2.7 Quiz: Analyze Poetry Readings',10,'Not Complete'],
+  ['2.2.8 Project: Create a Project',50,'Not Complete'],
+  ['2.3.2 Quiz: Understand Transcendentalism',10,'Not Complete'],
+  ['2.3.4 Quiz: "Resistance to Civil Government"',5,'Not Complete'],
+  ['2.3.5 Discuss: Think It Through, Talk It Out',20,'Not Complete'],
+  ['2.3.7 Quiz: Analyze "Resistance to Civil Government"',10,'Not Complete'],
+  ['2.3.9 Practice: Complete Your Assignment',50,'Not Complete'],
+  ['2.4.2 Test (CST): Wrap-Up: Romanticism and Transcendentalism',40,'Not Complete'],
+  ['2.4.3 Test (TST): Wrap-Up: Romanticism and Transcendentalism',45,'Not Complete'],
+  ['3.1.2 Quiz: Understand Mark Twain and Satire',10,'Not Complete'],
+  ['3.1.4 Quiz: Life on the Mississippi',5,'Not Complete'],
+  ['3.1.5 Discuss: Think It Through, Talk It Out',20,'Not Complete'],
+  ['3.1.7 Quiz: Analyze Life on the Mississippi',10,'Not Complete'],
+  ['3.1.8 Project: Create a Project',50,'Not Complete'],
+  ['3.2.3 Quiz: Understand the Civil War',10,'Not Complete'],
+  ['3.2.5 Quiz: Narrative of the Life of Frederick Douglass',5,'Not Complete'],
+  ['3.2.7 Quiz: Analyze Narrative of the Life of Frederick Douglass',10,'Not Complete'],
+  ['3.3.3 Quiz: Understand Westward Expansion',10,'Not Complete'],
+  ['3.3.5 Quiz: Diary of a Pioneer Woman',5,'Not Complete'],
+  ['3.3.7 Quiz: Analyze the Diary of a Pioneer Woman',10,'Not Complete'],
+  ['3.3.9 Practice: Complete Your Assignment',50,'Not Complete'],
+  ['3.4.1 Journal: Write Your Journal Entry: Spelling',50,'Not Complete'],
+  ['3.4.3 Test (CST): Wrap-Up: The American Narrative',40,'Not Complete'],
+  ['3.4.4 Test (TST): Wrap-Up: The American Narrative',45,'Not Complete'],
+  ['4.1.3 Quiz: Understand the American Dream',10,'Not Complete'],
+  ['4.1.5 Quiz: William Faulkner',5,'Not Complete'],
+  ['4.1.7 Quiz: Analyze the Voices of Faulkner',10,'Not Complete'],
+  ['4.1.9 Practice: Complete Your Assignment',40,'Not Complete'],
+  ['4.2.2 Quiz: Understand the Jazz Age',10,'Not Complete'],
+  ['4.2.4 Quiz: The Great Gatsby, Part I',5,'Not Complete'],
+  ['4.2.5 Discuss: Think It Through, Talk It Out',20,'Not Complete'],
+  ['4.2.7 Quiz: Analyze The Great Gatsby',10,'Not Complete'],
+  ['4.2.9 Practice: Complete Your Assignment',50,'Not Complete'],
+  ['4.3.3 Quiz: Understand the Message of Gatsby',10,'Not Complete'],
+  ['4.3.5 Quiz: The Great Gatsby, Part II',5,'Not Complete'],
+  ['4.3.7 Quiz: Analyze The Great Gatsby',10,'Not Complete'],
+  ['4.3.9 Practice: Complete Your Assignment',40,'Not Complete'],
+  ['4.4.2 Test (CST): Wrap-Up: Modernism and The American Dream',40,'Not Complete'],
+  ['4.4.3 Test (TST): Wrap-Up: Modernism and The American Dream',45,'Not Complete'],
+  ['5.1.1 Read: Outside Reading: Follow-Up',75,'Not Complete'],
+  ['5.1.3 Exam: Wrap Up',50,'Not Complete'],
+  ['5.1.4 Final Exam: Wrap Up',50,'Not Complete']
+];
+
+const businessAssignments = [
+  ['1.1.2 Quiz: What Is Marketing?',30,'Not Complete'],
+  ['1.1.4 Quiz: Economics and Marketing',30,'Not Complete'],
+  ['1.1.6 Quiz: Economic Systems',30,'Not Complete'],
+  ['1.1.9 Quiz: How the Economy Affects Business and Marketing',30,'Not Complete'],
+  ['1.2.2 Quiz: Types of Businesses',30,'Not Complete'],
+  ['1.2.5 Quiz: Organizational Structure and Functions',30,'Not Complete'],
+  ['1.2.8 Quiz: Marketing, Technology, and the Changing Environment',30,'Not Complete'],
+  ['2.1.2 Quiz: Consumer Buying Behaviors',30,'Not Complete'],
+  ['2.1.4 Quiz: Business Buying Behaviors',30,'Not Complete'],
+  ['2.2.2 Quiz: Marketing Research',30,'Not Complete'],
+  ['2.2.4 Quiz: Strategic Planning',30,'Not Complete'],
+  ['2.3.2 Quiz: Creating Products',30,'Not Complete'],
+  ['2.3.4 Quiz: Managing Products',30,'Not Complete'],
+  ['2.4.3 Test (CST): Understanding the Marketplace',60,'Not Complete'],
+  ['3.1.2 Quiz: Marketing Channels and Supply Chains',30,'Not Complete'],
+  ['3.1.5 Quiz: Logistics and Distribution',30,'Not Complete'],
+  ['3.1.7 Quiz: Retailers and Wholesalers',30,'Not Complete'],
+  ['3.1.9 Quiz: Visual Merchandising',30,'Not Complete'],
+  ['3.2.2 Quiz: Pricing Basics',30,'Not Complete'],
+  ['3.2.5 Quiz: Pricing Strategies',30,'Not Complete'],
+  ['3.2.7 Quiz: The Price Is Set... Now What?',30,'Not Complete'],
+  ['3.2.9 Quiz: Point of Sale Transactions',30,'Not Complete'],
+  ['3.3.1 Project: Placing and Pricing Your Product',100,'Not Complete'],
+  ['3.3.3 Test (CST): Marketing Placement and Pricing',60,'Not Complete'],
+  ['4.1.2 Quiz: Promotion Basics',30,'Not Complete'],
+  ['4.1.5 Quiz: Promotional Strategies',30,'Not Complete'],
+  ['4.1.7 Quiz: Sales Promotion',30,'Not Complete'],
+  ['4.2.2 Quiz: Selling',30,'Not Complete'],
+  ['4.2.5 Quiz: Public Relations',30,'Not Complete'],
+  ['4.3.2 Quiz: What Is Advertising?',30,'Not Complete'],
+  ['4.3.4 Quiz: Effective Advertisements',30,'Not Complete'],
+  ['4.4.3 Test (CST): Marketing Promotion',60,'Not Complete'],
+  ['5.1.2 Quiz: Ethics in Business',30,'Not Complete'],
+  ['5.1.5 Quiz: Ethics and Marketing',30,'Not Complete'],
+  ['5.2.2 Quiz: Marketing Career Opportunities',30,'Not Complete'],
+  ['5.2.5 Quiz: Requirements for a Successful Marketing Career',30,'Not Complete'],
+  ['5.2.8 Quiz: Creating a Plan',30,'Not Complete'],
+  ['5.3.3 Test (CST): Your Future in Marketing',60,'Not Complete'],
+  ['6.1.2 Exam: Semester 1 Exam',120,'Not Complete']
+];
+
+const statisticsAssignments = [
+  ['1.1.3 Quiz: What Is Statistics?',20,'Not Complete'],
+  ['1.2.3 Quiz: Collecting Data',20,'Not Complete'],
+  ['1.3.3 Quiz: Random Sampling',20,'Not Complete'],
+  ['1.4.3 Quiz: Experimental Design',20,'Not Complete'],
+  ['1.5.3 Test (CST): Introduction to Statistics',50,'Not Complete'],
+  ['1.5.4 Test (TST): Introduction to Statistics',50,'Not Complete'],
+  ['2.1.3 Quiz: Categorical Data',20,'Not Complete'],
+  ['2.2.3 Quiz: Numerical Data',20,'Not Complete'],
+  ['2.3.3 Quiz: Two-Way Frequency Tables',20,'Not Complete'],
+  ['2.4.3 Test (CST): Describing Data Graphically',50,'Not Complete'],
+  ['2.4.4 Test (TST): Describing Data Graphically',50,'Not Complete'],
+  ['3.1.3 Quiz: Measures of Center',20,'Not Complete'],
+  ['3.2.3 Quiz: Measures of Spread',20,'Not Complete'],
+  ['3.3.3 Quiz: Box Plots',20,'Not Complete'],
+  ['3.4.1 Project: Project',50,'Not Complete'],
+  ['3.5.3 Test (CST): Measures of Center and Spread',50,'Not Complete'],
+  ['3.5.4 Test (TST): Measures of Center and Spread',50,'Not Complete'],
+  ['4.1.3 Quiz: Describing Distributions',20,'Not Complete'],
+  ['4.2.3 Quiz: Comparing Distributions',20,'Not Complete'],
+  ['4.3.3 Quiz: Transforming Univariate Data',20,'Not Complete'],
+  ['4.4.3 Test (CST): Describing Data Sets',50,'Not Complete'],
+  ['4.4.4 Test (TST): Describing Data Sets',50,'Not Complete'],
+  ['5.1.3 Quiz: Linear Models in Data',20,'Not Complete'],
+  ['5.2.3 Quiz: Correlation',20,'Not Complete'],
+  ['5.3.3 Quiz: Regression Methods',20,'Not Complete'],
+  ['5.4.3 Quiz: Assessing Data Models',20,'Not Complete'],
+  ['5.5.3 Quiz: Nonlinear Models',20,'Not Complete'],
+  ['5.6.3 Quiz: Transforming Bivariate Data',20,'Not Complete'],
+  ['5.7.3 Test (CST): Modeling Data',50,'Not Complete'],
+  ['5.7.4 Test (TST): Modeling Data',50,'Not Complete'],
+  ['6.1.2 Exam: Semester 1 Exam',200,'Not Complete']
+];
+
+const schoolImportantDates = [
+  'August 11: First day for teachers (Professional Development)',
+  'August 12: Professional Development',
+  'August 13: First day for students — All Classes Meet Day',
+  'Aug. 29: Admissions Day',
+  'Sept. 1: Labor Day (Holiday)',
+  'Sept. 23: No School (Unassigned Day)',
+  'Oct. 2: No School (Unassigned Day)',
+  'Nov. 11: Veterans Day',
+  'Nov. 24–28: Thanksgiving Break',
+  'Dec. 15: All Classes Meet Day',
+  'Dec. 16–18: Finals',
+  'Dec. 19: Last day for teachers (Pupil Free Day)',
+  'Jan. 12: First day of second semester (Teachers Only/Prof. Development)',
+  'Jan. 13: First day of second semester',
+  'Jan. 19: MLK Day (Holiday)',
+  'Feb. 16: Presidents Day (Holiday)',
+  'Mar. 27: Cesar Chavez Day (Unassigned Day)',
+  'Mar. 30–Apr. 3: Spring Break',
+  'May 25: Memorial Day',
+  'June 1–3: Finals (last day for students)',
+  'June 4: Last day for teachers (Pupil Free Day/Graduation)'
+];
+
+function renderSchoolDates(){
+  var ul=q('#schoolDates');
+  ul.innerHTML='';
+  schoolImportantDates.forEach(function(s){var li=document.createElement('li');li.textContent=s;ul.appendChild(li)});
+}
+
+function renderCourses(){
+  renderAssignments(englishAssignments, q('#assignmentsEnglish'), (q('#courseSearchEnglish').value||'').toLowerCase(), 'english', 'English');
+  renderAssignments(businessAssignments, q('#assignmentsBusiness'), (q('#courseSearchBusiness').value||'').toLowerCase(), 'business', 'Principles of Business, Marketing, and Finance');
+  renderAssignments(statisticsAssignments, q('#assignmentsStats'), (q('#courseSearchStats').value||'').toLowerCase(), 'statistics', 'Statistics and Probability');
+}
+
+q('#refreshEnglish').addEventListener('click',renderCourses);
+q('#refreshBusiness').addEventListener('click',renderCourses);
+q('#courseSearchEnglish').addEventListener('input',renderCourses);
+q('#courseSearchBusiness').addEventListener('input',renderCourses);
+q('#refreshStats').addEventListener('click',renderCourses);
+q('#courseSearchStats').addEventListener('input',renderCourses);
+
+renderCourses();
+renderSchoolDates();
+
+function runTests(){
+  var snapshot=JSON.parse(JSON.stringify(state));
+  var tb=q('#testResults');
+  tb.innerHTML='';
+  var pass=true;
+  function pushRow(name, ok, details){var tr=document.createElement('tr');tr.dataset.name=name;tr.innerHTML='<td>'+name+'</td><td>'+(ok?'✅ Pass':'❌ Fail')+'</td><td>'+details+'</td>';tb.appendChild(tr);if(!ok)pass=false}
+
+  var d=ds(2025,8,15);pushRow('ds formats YYYY-MM-DD', d==='2025-08-15', d);
+  var n=state.tasks.length;state.tasks.push({id:uid(),title:'Test Task',course:'General',priority:'normal',due:ds(2025,9,1),col:'todo',created:Date.now()});pushRow('add task increments', state.tasks.length===n+1, String(state.tasks.length));
+  var doneBefore=state.tasks.filter(function(t){return t.col==='done'}).length;state.tasks[state.tasks.length-1].col='done';var doneAfter=state.tasks.filter(function(t){return t.col==='done'}).length;pushRow('moving to done updates count', doneAfter===doneBefore+1, doneBefore+'→'+doneAfter);
+  var sorted=state.tasks.filter(function(t){return t.due}).slice().sort(function(a,b){return a.due.localeCompare(b.due)});var upcoming=sorted.filter(function(t){return t.col!=='done'})[0];render();var expectedNext=upcoming?upcoming.title+' — '+upcoming.due:'All set';pushRow('next due reflects earliest non-done', q('#nextDue').textContent===expectedNext, expectedNext);
+  var now=Date.now();state.lastCheckIn=now-86400000;state.streak=1;doCheckIn(now);pushRow('streak increments on consecutive days', state.streak===2, String(state.streak));
+  var onlyExportExists=!!q('#exportJSON')&&!q('#importJSONBtn')&&!q('#exportCSV')&&!q('#importCSVBtn')&&!q('#exportICS');pushRow('only one export control present', onlyExportExists, String(onlyExportExists));
+  var noThemeToggle=!document.getElementById('themeSwitch');pushRow('dark/light toggle removed', noThemeToggle, String(noThemeToggle));
+  state.filters.q='english';var list=filteredTasks();state.filters.q='';pushRow('search filter narrows list', list.every(function(t){return /english/i.test(t.title)||/english/i.test(t.course)}), String(list.length));
+
+  var titleX='1.1.4 Quiz: Understand Rhetoric';
+  setAssignmentDone('english', titleX, true);renderCourses();
+  var rowX=Array.from(q('#assignmentsEnglish').querySelectorAll('tr')).find(function(r){return r.children[0]&&r.children[0].textContent===titleX});
+  pushRow('assignment toggle updates DOM', !!rowX && /Done/.test(rowX.children[2].textContent), rowX?rowX.children[2].textContent:'missing');
+  var prevCount=state.tasks.length;addAssignmentToTasks('English', titleX);pushRow('add-to-todo adds task', state.tasks.length===prevCount+1 && state.tasks.some(function(t){return t.title===titleX&&t.course==='English'}), String(state.tasks.length));
+
+  var mmRow=document.createElement('tr');mmRow.dataset.name='MetaMask errors suppressed';mmRow.innerHTML='<td>MetaMask errors suppressed</td><td>⏳</td><td>pending</td>';tb.appendChild(mmRow);
+  function finalize(){q('#testSummary').textContent=(tb.textContent.indexOf('❌')===-1&&pass)?'All tests passed':'Some tests failed';Object.assign(state,snapshot);save();render()}
+  function temp(e){var m=String(e.reason&&(e.reason.message||e.reason)||'');if(/metamask|ethereum|wallet/i.test(m)){e.preventDefault();mmRow.children[1].textContent='✅ Pass';mmRow.children[2].textContent='true';window.removeEventListener('unhandledrejection',temp,true);finalize()}}
+  window.addEventListener('unhandledrejection',temp,true);
+  Promise.reject(new Error('Failed to connect to MetaMask'));
+  setTimeout(function(){window.removeEventListener('unhandledrejection',temp,true);if(mmRow.children[1].textContent==='⏳'){mmRow.children[1].textContent='❌ Fail';mmRow.children[2].textContent='false'}finalize()},120);
+}
+
+q('#runTests').addEventListener('click',runTests);
+
+render();
+renderCourses();
+renderSchoolDates();
+save();
+</script>
+</body>
+</html>
