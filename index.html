@@ -77,7 +77,108 @@
 </style>
 </head>
 <body>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCZHDzeCr7rppc3AtnDgYXB27XVCWslJWo",
+  authDomain: "task-portal-f3751.firebaseapp.com",
+  projectId: "task-portal-f3751",
+  storageBucket: "task-portal-f3751.firebasestorage.app",
+  messagingSenderId: "858812596813",
+  appId: "1:858812596813:web:3b2266b1b5bedf8d7e9204",
+  measurementId: "G-7MPCMD70SB"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  signInAnonymously(auth).catch(() => {});
+
+  const KEY = "john_org_hub";
+
+  function getState() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch { return {}; }
+  }
+  function setState(s) {
+    localStorage.setItem(KEY, JSON.stringify(s));
+    if (typeof window.render === "function") render();
+    if (typeof window.renderCourses === "function") renderCourses();
+    if (typeof window.renderSchoolDates === "function") renderSchoolDates();
+    const cs = document.getElementById("cloudStatus");
+    if (cs) cs.textContent = "Cloud: " + room;
+  }
+
+  // Room ID in URL (?room=abc123) or persisted locally
+  function ensureRoom() {
+    const urlRoom = new URLSearchParams(location.search).get("room");
+    let room = urlRoom || localStorage.getItem("cloud_room");
+    if (!room) {
+      room = Math.random().toString(36).slice(2, 8);
+      localStorage.setItem("cloud_room", room);
+      const url = new URL(location.href);
+      url.searchParams.set("room", room);
+      history.replaceState(null, "", url);
+    }
+    return room;
+  }
+
+  const room = ensureRoom();
+  const ref  = doc(db, "rooms", room);
+
+  let pushing = false;
+  let pushTimer = 0;
+  function pushNow() {
+    if (pushing) return;
+    pushing = true;
+    setDoc(ref, { state: getState(), ts: Date.now() }, { merge: true })
+      .finally(() => (pushing = false));
+  }
+  function pushDebounced() {
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushNow, 250);
+  }
+
+  // Live load from Firestore
+  onSnapshot(ref, (snap) => {
+    const data = snap.data();
+    if (!data || !data.state) return;
+    // Avoid echo if we were the last writer: still safe to set
+    setState(data.state);
+  });
+
+  // Hook your existing global save() so every change syncs
+  const originalSave = window.save;
+  window.save = function () {
+    if (typeof originalSave === "function") originalSave();
+    pushDebounced();
+  };
+
+  // Manual “Connect” button to force an immediate push once
+  const btn = document.getElementById("connectCloud");
+  if (btn) btn.addEventListener("click", pushNow);
+
+  // Initial UI status
+  const cs = document.getElementById("cloudStatus");
+  if (cs) cs.textContent = "Cloud: " + room;
+</script>
   <header class="hero">
+    <span class="pill" id="cloudStatus">Cloud: Offline</span>
+<button class="ghost" id="connectCloud">Connect Cloud Sync</button>
     <div class="hero-inner">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
